@@ -12,7 +12,7 @@ class EstimasiHariPembayaranController extends Controller
      */
     public function index()
     {
-        $estimasiHari = EstimasiHariPembayaran::all();
+        $estimasiHari = EstimasiHariPembayaran::orderByDesc('periode_waktu')->get();
         return view('estimasi_hari_pembayaran.index', compact('estimasiHari'));
     }
 

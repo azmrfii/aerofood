@@ -20,6 +20,7 @@ Route::redirect('/dashboard', '/');
 Route::prefix('menu')->group(function () {
     Route::resource('purchase_order', PurchaseOrderController::class);
     Route::post('purchase_order/form_beli', [PurchaseOrderController::class, 'form_beli'])->name('purchase_order.form_beli');
+    Route::post('purchase_order/uang_masuk', [PurchaseOrderController::class, 'uang_masuk'])->name('purchase_order.uang_masuk');
     Route::resource('barang', BarangController::class);
     Route::resource('bongkar_muat', BongkarMuatController::class);
     Route::resource('persentase_keuntungan', PersentaseKeuntunganController::class);

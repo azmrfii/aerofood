@@ -98,7 +98,31 @@ class PurchaseOrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'tgl_po' => 'required|date',
+            'tgl_delivery' => 'nullable|date',
+            'no_po' => 'required|string',
+            'barang_id' => 'required|exists:barangs,id',
+            'qty' => 'required|integer',
+            'jumlah' => 'required|numeric',
+            'persentase_keuntungan_id' => 'required|exists:persentase_keuntungans,id',
+            'estimasi_hari_pembayaran_id' => 'required|exists:estimasi_hari_pembayarans,id',
+        ]);
+
+        if (PurchaseOrder::where('no_po', $validated['no_po'])->where('id', '!=', $id)->exists()) {
+            return back()->with('error', 'No PO sudah ada');
+        }
+
+        $barang = Barang::find($validated['barang_id']);
+        if (!$barang) {
+            return back()->with('error', 'Barang tidak ditemukan');
+        }
+        $validated['harga_satuan'] = $barang->harga;
+
+        $purchaseOrder = PurchaseOrder::findOrFail($id);
+        $purchaseOrder->update($validated);
+
+        return redirect()->route('purchase_order.index')->with('success', 'Purchase Order berhasil diupdate');
     }
 
     /**
@@ -127,5 +151,40 @@ class PurchaseOrderController extends Controller
         $purchaseOrder->save();
 
         return redirect()->route('purchase_order.index')->with('success', 'Data pembelian berhasil disimpan');
+    }
+
+    public function uang_masuk(Request $request)
+    {
+        $validated = $request->validate([
+            'purchase_order_id' => 'required|exists:purchase_orders,id',
+            'uang_masuk' => 'required|numeric',
+            'tgl_uang_masuk' => 'required|date',
+            'note' => 'nullable',
+        ]);
+
+        $purchaseOrder = PurchaseOrder::findOrFail($validated['purchase_order_id']);
+        $purchaseOrder->uang_masuk = $validated['uang_masuk'];
+        $purchaseOrder->tgl_uang_masuk = $validated['tgl_uang_masuk'];
+
+        // Hitung selisih hari dari tgl_delivery ke tgl_uang_masuk
+        if ($purchaseOrder->tgl_delivery && $purchaseOrder->tgl_uang_masuk) {
+            $tglDelivery = \Carbon\Carbon::parse($purchaseOrder->tgl_delivery);
+            $tglUangMasuk = \Carbon\Carbon::parse($purchaseOrder->tgl_uang_masuk);
+            $selisihHari = $tglDelivery->diffInDays($tglUangMasuk);
+
+            // Cari estimasi hari pembayaran
+            $estimasi = \App\Models\EstimasiHariPembayaran::where('periode_waktu', $selisihHari)->first();
+            if (!$estimasi) {
+                // Buat baru jika belum ada
+                $estimasi = \App\Models\EstimasiHariPembayaran::create([
+                    'periode_waktu' => $selisihHari
+                ]);
+            }
+            $purchaseOrder->estimasi_hari_pembayaran_id = $estimasi->id;
+        }
+
+        $purchaseOrder->save();
+
+        return redirect()->route('purchase_order.index')->with('success', 'Data Uang Masuk berhasil disimpan');
     }
 }

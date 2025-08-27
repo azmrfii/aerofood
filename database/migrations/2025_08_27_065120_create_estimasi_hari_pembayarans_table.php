@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('estimasi_hari_pembayarans', function (Blueprint $table) {
             $table->id();
-            $table->integer('periode_waktu');
+            $table->integer('periode_waktu')->unique();
             $table->timestamps();
         });
     }

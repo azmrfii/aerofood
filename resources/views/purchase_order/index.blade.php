@@ -63,13 +63,11 @@
                                     @endif
                                 </td>
                                 @if (is_null($item->tgl_beli))
-                                    {{-- Kalau belum bayar, kosongkan kolom --}}
                                     <td>Rp. 0</td>
                                     <td>Rp. 0</td>
                                     <td>Rp. 0</td>
                                     <td>Rp. 0</td>
                                 @else
-                                    {{-- Kalau sudah bayar, tampilkan datanya --}}
                                     <td>{{ 'Rp. ' . number_format($item->harga_beli, 0, ',', '.') }}</td>
                                     <td>
                                         {{ $item->bongkar_muat ? 'Rp. ' . number_format($item->bongkar_muat->harga_bongkar, 0, ',', '.') : 'Rp. 0' }}
@@ -92,8 +90,10 @@
                                         ({{ $persen }}%)
                                     </td>
                                 @endif
-                                <td>{{ $item->uang_masuk ?? '-' }}</td>
-                                <td>{{ $item->tgl_uang_masuk ?? '-' }}</td>
+                                <td>{{ 'Rp. ' . number_format($item->uang_masuk, 0, ',', '.') }}</td>
+                                <td>
+                                    {{ $item->tgl_uang_masuk ? \Carbon\Carbon::parse($item->tgl_uang_masuk)->format('d F Y') : '-' }}
+                                </td>
                                 <td>{{ $item->estimasi_hari_pembayaran ? $item->estimasi_hari_pembayaran->periode_waktu : '-' }}
                                     Hari</td>
                                 <td>
@@ -109,7 +109,7 @@
                                         @if ($item->tgl_delivery != null)
                                             <button class="btn btn-sm btn-success" title="Uang Masuk"
                                                 data-id="{{ $item->id }}" data-toggle="modal"
-                                                data-target="#modalUangMasuk">
+                                                data-target="#modalFormUangMasuk">
                                                 <i class="fas fa-money-bill-wave"></i>
                                             </button>
                                         @endif
@@ -130,7 +130,9 @@
             </div>
         </div>
         @include('purchase_order.modal-add')
+        @include('purchase_order.modal-edit')
         @include('purchase_order.modal-form-beli')
+        @include('purchase_order.modal-form-uang-masuk')
     @stop
 
     @section('js')
@@ -140,6 +142,11 @@
             $(document).on('click', '[data-target="#modalFormBeli"]', function() {
                 let purchaseOrderId = $(this).data('id');
                 $('#purchase_order_id').val(purchaseOrderId);
+            });
+
+            $(document).on('click', '[data-target="#modalFormUangMasuk"]', function() {
+                let purchaseOrderId = $(this).data('id');
+                $('#purchase_order_id_uang_masuk').val(purchaseOrderId);
             });
         </script>
         <script>

@@ -17,7 +17,8 @@
 
                     <div class="form-group">
                         <label for="tgl_beli">Tanggal Beli</label>
-                        <input type="date" name="tgl_beli" id="tgl_beli" class="form-control" required value="{{ date('Y-m-d') }}">
+                        <input type="date" name="tgl_beli" id="tgl_beli" class="form-control" required
+                            value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
                     </div>
 
                     <div class="form-group">

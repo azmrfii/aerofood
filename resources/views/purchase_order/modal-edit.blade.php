@@ -1,11 +1,12 @@
-<!-- Modal Tambah Purchase Order -->
-<div class="modal fade" id="modalTambahPO" tabindex="-1" role="dialog" aria-labelledby="tambahPOLabel" aria-hidden="true">
+<!-- Modal Edit Purchase Order -->
+<div class="modal fade" id="modalEditPO" tabindex="-1" role="dialog" aria-labelledby="editPOLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <form action="{{ route('purchase_order.store') }}" method="POST">
+            <form id="formEditPO" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tambahPOLabel">Tambah Purchase Order</h5>
+                    <h5 class="modal-title" id="editPOLabel">Edit Purchase Order</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -16,31 +17,32 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Tanggal PO</label>
-                                    <input type="date" name="tgl_po" class="form-control" required
-                                        value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
+                                    <input type="date" name="tgl_po" id="edit_tgl_po" class="form-control"
+                                        max="{{ date('Y-m-d') }}" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Tanggal Delivery</label>
-                                    <input type="date" name="tgl_delivery" class="form-control" max="{{ date('Y-m-d') }}">
+                                    <input type="date" name="tgl_delivery" id="edit_tgl_delivery"
+                                        class="form-control" max="{{ date('Y-m-d') }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>No. PO</label>
-                                    <input type="text" name="no_po" class="form-control" placeholder="123"
-                                        required>
+                                    <input type="text" name="no_po" id="edit_no_po" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Barang</label>
-                                    <select name="barang_id" id="barang_id" class="form-control" required>
+                                    <select name="barang_id" id="edit_barang_id" class="form-control" required>
                                         @foreach ($barangs as $barang)
                                             <option value="{{ $barang->id }}" data-harga="{{ $barang->harga }}">
                                                 {{ $barang->nama_barang }} (Rp.
-                                                {{ number_format($barang->harga, 0, ',', '.') }})</option>
+                                                {{ number_format($barang->harga, 0, ',', '.') }})
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -48,25 +50,25 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Qty</label>
-                                    <input type="number" name="qty" id="qty" class="form-control"
-                                        min="1" placeholder="1" required>
+                                    <input type="number" name="qty" id="edit_qty" class="form-control"
+                                        min="1" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Jumlah</label>
-                                    <input type="number" name="jumlah" id="jumlah" class="form-control" readonly
+                                    <input type="number" name="jumlah" id="edit_jumlah" class="form-control" readonly
                                         required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Persentase Keuntungan</label>
-                                    <select name="persentase_keuntungan_id" id="persentase_keuntungan_id"
+                                    <select name="persentase_keuntungan_id" id="edit_persentase_keuntungan_id"
                                         class="form-control" required>
                                         @foreach ($persentaseKeuntungans as $persentase)
-                                            <option value="{{ $persentase->id }}">
-                                                {{ $persentase->besaran_persen }}%</option>
+                                            <option value="{{ $persentase->id }}">{{ $persentase->besaran_persen }}%
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -74,11 +76,11 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Estimasi Hari Pembayaran</label>
-                                    <select name="estimasi_hari_pembayaran_id" id="estimasi_hari_pembayaran_id"
+                                    <select name="estimasi_hari_pembayaran_id" id="edit_estimasi_hari_pembayaran_id"
                                         class="form-control" required>
                                         @foreach ($estimasiHariPembayarans as $estimasiHari)
-                                            <option value="{{ $estimasiHari->id }}">
-                                                {{ $estimasiHari->periode_waktu }} Hari</option>
+                                            <option value="{{ $estimasiHari->id }}">{{ $estimasiHari->periode_waktu }}
+                                                Hari</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -88,7 +90,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </form>
         </div>
@@ -97,9 +99,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const barangSelect = document.getElementById('barang_id');
-        const qtyInput = document.getElementById('qty');
-        const jumlahInput = document.getElementById('jumlah');
+        const barangSelect = document.getElementById('edit_barang_id');
+        const qtyInput = document.getElementById('edit_qty');
+        const jumlahInput = document.getElementById('edit_jumlah');
 
         function updateJumlah() {
             const selectedOption = barangSelect.options[barangSelect.selectedIndex];

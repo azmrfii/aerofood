@@ -22,6 +22,7 @@ class PurchaseOrder extends Model
         'uang_masuk',
         'tgl_uang_masuk',
         'bongkar_muat_id',
+        'note',
         'estimasi_hari_pembayaran_id',
     ];
 
