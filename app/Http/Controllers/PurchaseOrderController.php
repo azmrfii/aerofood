@@ -107,6 +107,8 @@ class PurchaseOrderController extends Controller
             'jumlah' => 'required|numeric',
             'persentase_keuntungan_id' => 'required|exists:persentase_keuntungans,id',
             'estimasi_hari_pembayaran_id' => 'required|exists:estimasi_hari_pembayarans,id',
+            'uang_masuk' => 'nullable|numeric',
+            'tgl_uang_masuk' => 'nullable|date',
         ]);
 
         if (PurchaseOrder::where('no_po', $validated['no_po'])->where('id', '!=', $id)->exists()) {
@@ -120,7 +122,30 @@ class PurchaseOrderController extends Controller
         $validated['harga_satuan'] = $barang->harga;
 
         $purchaseOrder = PurchaseOrder::findOrFail($id);
-        $purchaseOrder->update($validated);
+        $oldTglUangMasuk = $purchaseOrder->tgl_uang_masuk;
+
+        // Update data
+        $purchaseOrder->fill($validated);
+
+        // Ambil tgl_uang_masuk dari request jika ada, jika tidak pakai dari model
+        $tglUangMasukBaru = !empty($validated['tgl_uang_masuk']) ? $validated['tgl_uang_masuk'] : $oldTglUangMasuk;
+
+        // Jika tgl_uang_masuk sudah ada dan berubah, hitung estimasi hari pembayaran
+        if (!empty($tglUangMasukBaru) && $tglUangMasukBaru != $oldTglUangMasuk && !empty($purchaseOrder->tgl_delivery)) {
+            $tglDelivery = \Carbon\Carbon::parse($purchaseOrder->tgl_delivery);
+            $tglUangMasuk = \Carbon\Carbon::parse($tglUangMasukBaru);
+            $selisihHari = $tglDelivery->diffInDays($tglUangMasuk);
+            $estimasi = \App\Models\EstimasiHariPembayaran::where('periode_waktu', $selisihHari)->first();
+            if (!$estimasi) {
+                $estimasi = \App\Models\EstimasiHariPembayaran::create([
+                    'periode_waktu' => $selisihHari
+                ]);
+            }
+            $purchaseOrder->estimasi_hari_pembayaran_id = $estimasi->id;
+        }
+        // Jika tgl_uang_masuk belum ada, gunakan data estimasi awal (tidak diubah)
+
+        $purchaseOrder->save();
 
         return redirect()->route('purchase_order.index')->with('success', 'Purchase Order berhasil diupdate');
     }

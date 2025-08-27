@@ -114,3 +114,30 @@
         qtyInput.addEventListener('input', updateJumlah);
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.btn-edit-po');
+        const form = document.getElementById('formEditPO');
+
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                form.action = "{{ route('purchase_order.update', ':id') }}".replace(':id', id);
+
+                // isi input
+                document.getElementById('edit_tgl_po').value = this.getAttribute('data-tgl_po');
+                document.getElementById('edit_tgl_delivery').value = this.getAttribute(
+                    'data-tgl_delivery');
+                document.getElementById('edit_no_po').value = this.getAttribute('data-no_po');
+                document.getElementById('edit_barang_id').value = this.getAttribute(
+                    'data-barang_id');
+                document.getElementById('edit_qty').value = this.getAttribute('data-qty');
+                document.getElementById('edit_jumlah').value = this.getAttribute('data-jumlah');
+                document.getElementById('edit_persentase_keuntungan_id').value = this
+                    .getAttribute('data-persentase_keuntungan_id');
+                document.getElementById('edit_estimasi_hari_pembayaran_id').value = this
+                    .getAttribute('data-estimasi_hari_pembayaran_id');
+            });
+        });
+    });
+</script>

@@ -98,10 +98,17 @@
                                     Hari</td>
                                 <td>
                                     <div class="d-flex justify-content-center align-items-center" style="gap: 4px;">
-                                        <button class="btn btn-sm btn-warning" title="Edit" data-id="{{ $item->id }}"
-                                            data-toggle="modal" data-target="#modalEditPO">
+                                        <button class="btn btn-sm btn-warning btn-edit-po" data-id="{{ $item->id }}"
+                                            data-tgl_po="{{ $item->tgl_po }}"
+                                            data-tgl_delivery="{{ $item->tgl_delivery }}" data-no_po="{{ $item->no_po }}"
+                                            data-barang_id="{{ $item->barang_id }}" data-qty="{{ $item->qty }}"
+                                            data-jumlah="{{ $item->jumlah }}"
+                                            data-persentase_keuntungan_id="{{ $item->persentase_keuntungan_id }}"
+                                            data-estimasi_hari_pembayaran_id="{{ $item->estimasi_hari_pembayaran_id }}"
+                                            data-toggle="modal" data-target="#modalEditPO" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
+
                                         <button class="btn btn-sm btn-info" title="Form Beli" data-id="{{ $item->id }}"
                                             data-toggle="modal" data-target="#modalFormBeli">
                                             <i class="fas fa-shopping-cart"></i>
