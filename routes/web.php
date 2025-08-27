@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BongkarMuatController;
+use App\Http\Controllers\EstimasiHariPembayaranController;
+use App\Http\Controllers\PersentaseKeuntunganController;
+use App\Http\Controllers\PurchaseOrderController;
+
+// Route::get('/', function () {
+    // return view('welcome');
+// });
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::redirect('/dashboard', '/');
+
+Route::prefix('menu')->group(function () {
+    Route::resource('purchase_order', PurchaseOrderController::class);
+    Route::post('purchase_order/form_beli', [PurchaseOrderController::class, 'form_beli'])->name('purchase_order.form_beli');
+    Route::resource('barang', BarangController::class);
+    Route::resource('bongkar_muat', BongkarMuatController::class);
+    Route::resource('persentase_keuntungan', PersentaseKeuntunganController::class);
+    Route::resource('estimasi_hari_pembayaran', EstimasiHariPembayaranController::class);
+});
