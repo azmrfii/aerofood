@@ -338,8 +338,8 @@ return [
         ],
         ['header' => 'LAPORAN'],
         [
-            'text' => 'Laporan',
-            'url' => 'laporan/laporan',
+            'text' => 'Purchase Order',
+            'url' => 'laporan/purchase_order',
             'icon' => 'far fa-fw fa-chart-bar',
         ],
     ],
